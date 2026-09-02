@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>2026 Mesai Takibi</title>
   <style>
     * {
@@ -15,9 +15,8 @@
 
     html, body {
       width: 100%;
-      min-height: 100vh;
+      min-height: 100%;
       background-color: #f4f6f8;
-      overflow-y: auto !important; /* Dikey kaydırmayı kesin olarak aktif eder */
     }
 
     body {
@@ -36,7 +35,7 @@
       padding: 12px;
       display: flex;
       flex-direction: column;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .hidden {
@@ -130,7 +129,7 @@
     }
 
     .day-cell {
-      height: 50px;
+      height: 48px;
       border: 1px solid #ccc;
       display: flex;
       flex-direction: column;
@@ -151,7 +150,7 @@
 
     .day-input {
       width: 100%;
-      height: 30px;
+      height: 28px;
       border: none;
       text-align: center;
       font-size: 15px !important;
@@ -161,10 +160,10 @@
     }
 
     .total-bar {
-      margin-top: 12px;
+      margin-top: 10px;
       background: #4caf50;
       color: white;
-      padding: 10px;
+      padding: 8px;
       text-align: center;
       font-weight: bold;
       font-size: 15px;
@@ -236,13 +235,11 @@
 </head>
 <body>
 
-  <!-- 12 AY SEÇİM EKRANI -->
   <div id="monthsView" class="container">
     <h2>2026 MESAİ</h2>
     <div id="monthsGrid" class="months-grid"></div>
   </div>
 
-  <!-- AY DETAY / TAKVİM VE HESAPLAMA EKRANI -->
   <div id="calendarView" class="container hidden">
     <div class="header-nav">
       <button id="backBtn">← Geri</button>
@@ -250,21 +247,17 @@
       <div style="width: 45px;"></div>
     </div>
 
-    <!-- Gün Başlıkları (Pt - Pz) -->
     <div class="weekdays-grid">
       <div>Pt</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
     </div>
 
-    <!-- Takvim Günleri ve Mesai Girdileri -->
     <div id="daysGrid" class="days-grid"></div>
 
-    <!-- Toplam Mesai Görünümü -->
     <div class="total-bar">
       <span>Toplam Mesai: </span>
       <span id="totalHours">0</span> Saat
     </div>
 
-    <!-- MAAŞ HESAPLAMA TABLOSU -->
     <div class="salary-calc-card">
       <div class="calc-row">
         <span class="label">Saat Ücreti</span>
@@ -352,15 +345,20 @@
       }
     }
 
-    [hourlyRateInput, advanceValInput, unionFeeValInput, taxRateValInput].forEach(input => {
-      input.oninput = () => {
-        localStorage.setItem("salary_hourlyRate", hourlyRateInput.value);
-        localStorage.setItem("salary_advance", advanceValInput.value);
-        localStorage.setItem("salary_unionFee", unionFeeValInput.value);
-        localStorage.setItem("salary_taxRate", taxRateValInput.value);
-        calculateSalary();
-      };
-    });
+    function attachSalaryEvents() {
+      const inputs = [hourlyRateInput, advanceValInput, unionFeeValInput, taxRateValInput];
+      inputs.forEach(input => {
+        if (input) {
+          input.oninput = () => {
+            localStorage.setItem("salary_hourlyRate", hourlyRateInput.value);
+            localStorage.setItem("salary_advance", advanceValInput.value);
+            localStorage.setItem("salary_unionFee", unionFeeValInput.value);
+            localStorage.setItem("salary_taxRate", taxRateValInput.value);
+            calculateSalary();
+          };
+        }
+      });
+    }
 
     function renderMonthsList() {
       monthsGrid.innerHTML = "";
@@ -391,14 +389,12 @@
       monthsView.classList.add("hidden");
       calendarView.classList.remove("hidden");
       renderCalendar(index);
-      window.scrollTo(0, 0);
     }
 
     backBtn.onclick = () => {
       calendarView.classList.add("hidden");
       monthsView.classList.remove("hidden");
       renderMonthsList();
-      window.scrollTo(0, 0);
     };
 
     function renderCalendar(monthIndex) {
@@ -482,6 +478,7 @@
     }
 
     loadSavedSalaryConfig();
+    attachSalaryEvents();
     renderMonthsList();
   </script>
 </body>
