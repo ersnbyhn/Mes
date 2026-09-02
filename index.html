@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <!-- Klavye açıldığında ekranın yakınlaşmasını / büyümesini engeller -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Mobil cihazlarda otomatik yakınlaşmayı ve sayfa kaymasını tamamen engeller -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>2026 Mesai Takibi</title>
   <style>
     * {
@@ -11,31 +11,33 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      touch-action: manipulation; /* Çift tıklamayla büyütmeyi engeller */
+      touch-action: manipulation;
     }
 
     html, body {
       height: 100%;
       width: 100%;
-      overflow-x: hidden;
+      overflow: hidden; /* Sayfanın taşmasını ve büyümesini engeller */
+      position: fixed; /* Mobilde klavye açıldığında sayfanın kaymasını kilitler */
+      background-color: #f4f6f8;
     }
 
     body {
-      background-color: #f4f6f8;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       padding: 10px;
     }
 
     .container {
       width: 100%;
       max-width: 420px;
-      height: calc(100vh - 45px); /* Ekran yüksekliğine tam oturur */
+      height: 100%;
+      max-height: 95vh;
       background: #fff;
       border: 2px solid #333;
       border-radius: 8px;
-      padding: 10px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
     }
@@ -46,24 +48,29 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-weight: bold;
       font-size: 18px;
       flex-shrink: 0;
     }
 
-    /* 12 Ay Listesi - Ekrana Tam Sığma Ayarı */
+    /* 12 Ay Listesi - Sayfaya Tam Ortalanmış Yapı */
+    #monthsView {
+      justify-content: center;
+    }
+
     .months-grid {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
       flex: 1;
-      justify-content: space-between;
+      justify-content: center; /* Ayları dikeyde tam ortalar */
     }
 
     .month-btn {
       flex: 1;
-      padding: 0 12px;
+      max-height: 45px;
+      padding: 0 15px;
       background: #fff;
       border: 2px solid #333;
       font-size: 15px;
@@ -146,16 +153,17 @@
       text-align: left;
     }
 
-    /* Mobil klavye açıldığında yakınlaşmayı engelleyen 16px font kuralı */
+    /* iOS & Android klavye odaklanmasında otomatik zoom yapmayı önleyen CSS ayarları */
     .day-input {
       width: 100%;
       border: none;
       text-align: center;
-      font-size: 16px; 
+      font-size: 16px !important; /* Minimum 16px zoom'u engeller */
       font-weight: bold;
       padding: 2px 0;
       background: #88d498;
       outline: none;
+      -webkit-text-size-adjust: 100%;
     }
 
     /* Toplam Mesai Alanı */
@@ -169,20 +177,6 @@
       font-size: 15px;
       border-radius: 4px;
       flex-shrink: 0;
-    }
-
-    /* En Alt Sağ Köşede Sabit Kalan İmza */
-    .footer-credits {
-      position: fixed;
-      bottom: 5px;
-      right: 10px;
-      font-size: 11px;
-      font-weight: bold;
-      color: #666;
-      background-color: rgba(244, 246, 248, 0.9);
-      padding: 2px 5px;
-      border-radius: 3px;
-      z-index: 9999;
     }
   </style>
 </head>
@@ -216,9 +210,6 @@
       <span id="totalHours">0</span> Saat
     </div>
   </div>
-
-  <!-- SABİT İMZA -->
-  <div class="footer-credits">Hazırlayan: ErsNByhN</div>
 
   <script>
     const monthNames = [
