@@ -32,14 +32,15 @@
     .container {
       width: 100%;
       max-width: 420px;
-      height: 100%;
-      max-height: 95vh;
+      height: 100dvh; /* Dynamic Viewport Height: Mobil ekran yüksekliğini tam kaplar */
+      max-height: 100dvh;
       background: #fff;
       border: 2px solid #333;
       border-radius: 8px;
       padding: 12px;
       display: flex;
       flex-direction: column;
+      justify-content: center; /* İçeriği dikeyde tam ortalar */
     }
 
     .hidden {
@@ -48,28 +49,29 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-weight: bold;
       font-size: 18px;
       flex-shrink: 0;
     }
 
-    /* 12 Ay Listesi - Sayfaya Tam Ortalanmış Yapı */
+    /* 12 Ay Listesi - Tam Dikey ve Yatay Ortalanmış Yapı */
     #monthsView {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
+      align-items: stretch;
     }
 
     .months-grid {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      flex: 1;
-      justify-content: center; /* Ayları dikeyde tam ortalar */
+      width: 100%;
     }
 
     .month-btn {
-      flex: 1;
-      max-height: 45px;
+      height: 42px;
       padding: 0 15px;
       background: #fff;
       border: 2px solid #333;
