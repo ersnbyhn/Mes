@@ -2,7 +2,8 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Klavye açıldığında ekranın yakınlaşmasını / büyümesini engeller -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>2026 Mesai Takibi</title>
   <style>
     * {
@@ -10,49 +11,62 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
+      touch-action: manipulation; /* Çift tıklamayla büyütmeyi engeller */
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     body {
       background-color: #f4f6f8;
       display: flex;
       justify-content: center;
-      padding: 15px;
-      min-height: 100vh;
-      position: relative;
-      padding-bottom: 40px;
+      align-items: flex-start;
+      padding: 10px;
     }
 
     .container {
       width: 100%;
       max-width: 420px;
+      height: calc(100vh - 45px); /* Ekran yüksekliğine tam oturur */
       background: #fff;
       border: 2px solid #333;
       border-radius: 8px;
-      padding: 15px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       font-weight: bold;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
-    /* 12 Ay Listesi ve Sağ Köşe Mesai Özeti */
+    /* 12 Ay Listesi - Ekrana Tam Sığma Ayarı */
     .months-grid {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 5px;
+      flex: 1;
+      justify-content: space-between;
     }
 
     .month-btn {
-      padding: 12px 15px;
+      flex: 1;
+      padding: 0 12px;
       background: #fff;
       border: 2px solid #333;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       display: flex;
       justify-content: space-between;
@@ -66,7 +80,7 @@
     }
 
     .month-hours-badge {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       color: #000;
     }
@@ -76,17 +90,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
+      flex-shrink: 0;
     }
 
     #backBtn {
-      padding: 6px 12px;
+      padding: 5px 10px;
       background: #333;
       color: #fff;
       border: none;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 13px;
     }
 
     /* Haftalık Başlıklar ve Takvim Izgarası */
@@ -97,60 +113,76 @@
       text-align: center;
     }
 
+    .weekdays-grid {
+      flex-shrink: 0;
+    }
+
     .weekdays-grid div {
       background: #7f8c8d;
       color: white;
-      padding: 6px 0;
-      font-size: 12px;
+      padding: 4px 0;
+      font-size: 11px;
       font-weight: bold;
+    }
+
+    .days-grid {
+      flex: 1;
+      grid-template-rows: repeat(6, 1fr);
     }
 
     .day-cell {
       border: 1px solid #ccc;
-      min-height: 55px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       background: #fff;
+      overflow: hidden;
     }
 
     .day-number {
-      font-size: 11px;
-      padding: 2px;
+      font-size: 10px;
+      padding: 1px 2px;
       background: #f9f9f9;
+      text-align: left;
     }
 
+    /* Mobil klavye açıldığında yakınlaşmayı engelleyen 16px font kuralı */
     .day-input {
       width: 100%;
       border: none;
       text-align: center;
-      font-size: 12px;
+      font-size: 16px; 
       font-weight: bold;
-      padding: 4px 0;
+      padding: 2px 0;
       background: #88d498;
       outline: none;
     }
 
     /* Toplam Mesai Alanı */
     .total-bar {
-      margin-top: 15px;
+      margin-top: 8px;
       background: #4caf50;
       color: white;
-      padding: 12px;
+      padding: 8px;
       text-align: center;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
       border-radius: 4px;
+      flex-shrink: 0;
     }
 
-    /* En Alt Sağ Köşe İmzası */
+    /* En Alt Sağ Köşede Sabit Kalan İmza */
     .footer-credits {
       position: fixed;
-      bottom: 8px;
-      right: 12px;
-      font-size: 12px;
+      bottom: 5px;
+      right: 10px;
+      font-size: 11px;
       font-weight: bold;
-      color: #555;
+      color: #666;
+      background-color: rgba(244, 246, 248, 0.9);
+      padding: 2px 5px;
+      border-radius: 3px;
+      z-index: 9999;
     }
   </style>
 </head>
@@ -166,8 +198,8 @@
   <div id="calendarView" class="container hidden">
     <div class="header-nav">
       <button id="backBtn">← Geri</button>
-      <h2 id="currentMonthTitle">AY</h2>
-      <div style="width: 50px;"></div>
+      <h2 id="currentMonthTitle" style="margin-bottom:0;">AY</h2>
+      <div style="width: 45px;"></div>
     </div>
 
     <!-- Gün Başlıkları (Pt - Pz) -->
@@ -185,7 +217,7 @@
     </div>
   </div>
 
-  <!-- ALT SAĞ İMZA -->
+  <!-- SABİT İMZA -->
   <div class="footer-credits">Hazırlayan: ErsNByhN</div>
 
   <script>
@@ -205,7 +237,6 @@
     const totalHours = document.getElementById("totalHours");
     const backBtn = document.getElementById("backBtn");
 
-    // Ana Ekranı ve Ayların Sağındaki Mesaileri Oluştur / Güncelle
     function renderMonthsList() {
       monthsGrid.innerHTML = "";
       monthNames.forEach((month, index) => {
@@ -218,7 +249,6 @@
         const hoursSpan = document.createElement("span");
         hoursSpan.className = "month-hours-badge";
         
-        // O ayın toplam mesaisini hesapla
         const monthlyTotal = getMonthTotalHours(index);
         hoursSpan.innerText = monthlyTotal > 0 ? monthlyTotal : "";
 
@@ -241,7 +271,7 @@
     backBtn.onclick = () => {
       calendarView.classList.add("hidden");
       monthsView.classList.remove("hidden");
-      renderMonthsList(); // Geri dönüldüğünde ay özetlerini tazelet
+      renderMonthsList();
     };
 
     function renderCalendar(monthIndex) {
@@ -249,9 +279,8 @@
       
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       let firstDay = new Date(year, monthIndex, 1).getDay();
-      firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Pazartesiden başlat
+      firstDay = (firstDay === 0) ? 6 : firstDay - 1;
 
-      // Boş kutular
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell";
@@ -259,7 +288,6 @@
         daysGrid.appendChild(emptyCell);
       }
 
-      // Gün kutuları ve mesai inputları
       for (let day = 1; day <= daysInMonth; day++) {
         const cell = document.createElement("div");
         cell.className = "day-cell";
@@ -304,7 +332,6 @@
       totalHours.innerText = total;
     }
 
-    // Başlangıçta ayları yükle
     renderMonthsList();
   </script>
 </body>
