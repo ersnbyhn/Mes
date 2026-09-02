@@ -17,6 +17,9 @@
       display: flex;
       justify-content: center;
       padding: 15px;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 40px;
     }
 
     .container {
@@ -38,7 +41,7 @@
       font-weight: bold;
     }
 
-    /* 12 Ay Listesi */
+    /* 12 Ay Listesi ve Sağ Köşe Mesai Özeti */
     .months-grid {
       display: flex;
       flex-direction: column;
@@ -46,18 +49,26 @@
     }
 
     .month-btn {
-      padding: 12px;
+      padding: 12px 15px;
       background: #fff;
       border: 2px solid #333;
       font-size: 16px;
       font-weight: bold;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       cursor: pointer;
       border-radius: 4px;
     }
 
     .month-btn:active {
       background-color: #e0e0e0;
+    }
+
+    .month-hours-badge {
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
     }
 
     /* Takvim Header */
@@ -116,7 +127,7 @@
       font-size: 12px;
       font-weight: bold;
       padding: 4px 0;
-      background: #88d498; /* Görseldeki yeşil tonu */
+      background: #88d498;
       outline: none;
     }
 
@@ -130,6 +141,16 @@
       font-weight: bold;
       font-size: 16px;
       border-radius: 4px;
+    }
+
+    /* En Alt Sağ Köşe İmzası */
+    .footer-credits {
+      position: fixed;
+      bottom: 8px;
+      right: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #555;
     }
   </style>
 </head>
@@ -149,9 +170,9 @@
       <div style="width: 50px;"></div>
     </div>
 
-    <!-- Gün Başlıkları (Pzt - Paz) -->
+    <!-- Gün Başlıkları (Pt - Pz) -->
     <div class="weekdays-grid">
-      <div>Pz</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
+      <div>Pt</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
     </div>
 
     <!-- Takvim Günleri ve Mesai Girdileri -->
@@ -164,12 +185,16 @@
     </div>
   </div>
 
+  <!-- ALT SAĞ İMZA -->
+  <div class="footer-credits">Hazırlayan: ErsNByhN</div>
+
   <script>
     const monthNames = [
       "OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN",
       "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"
     ];
 
+    const year = 2026;
     let selectedMonthIndex = 0;
 
     const monthsView = document.getElementById("monthsView");
@@ -180,14 +205,30 @@
     const totalHours = document.getElementById("totalHours");
     const backBtn = document.getElementById("backBtn");
 
-    // 12 Ay Butonlarını Oluştur
-    monthNames.forEach((month, index) => {
-      const btn = document.createElement("div");
-      btn.className = "month-btn";
-      btn.innerText = month;
-      btn.onclick = () => openMonth(index);
-      monthsGrid.appendChild(btn);
-    });
+    // Ana Ekranı ve Ayların Sağındaki Mesaileri Oluştur / Güncelle
+    function renderMonthsList() {
+      monthsGrid.innerHTML = "";
+      monthNames.forEach((month, index) => {
+        const btn = document.createElement("div");
+        btn.className = "month-btn";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.innerText = month;
+
+        const hoursSpan = document.createElement("span");
+        hoursSpan.className = "month-hours-badge";
+        
+        // O ayın toplam mesaisini hesapla
+        const monthlyTotal = getMonthTotalHours(index);
+        hoursSpan.innerText = monthlyTotal > 0 ? monthlyTotal : "";
+
+        btn.appendChild(titleSpan);
+        btn.appendChild(hoursSpan);
+
+        btn.onclick = () => openMonth(index);
+        monthsGrid.appendChild(btn);
+      });
+    }
 
     function openMonth(index) {
       selectedMonthIndex = index;
@@ -200,17 +241,17 @@
     backBtn.onclick = () => {
       calendarView.classList.add("hidden");
       monthsView.classList.remove("hidden");
+      renderMonthsList(); // Geri dönüldüğünde ay özetlerini tazelet
     };
 
     function renderCalendar(monthIndex) {
       daysGrid.innerHTML = "";
-      const year = 2026;
       
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       let firstDay = new Date(year, monthIndex, 1).getDay();
       firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Pazartesiden başlat
 
-      // İlk günden önceki boş kutular
+      // Boş kutular
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell";
@@ -218,7 +259,7 @@
         daysGrid.appendChild(emptyCell);
       }
 
-      // Günleri ve mesai giriş alanlarını oluştur
+      // Gün kutuları ve mesai inputları
       for (let day = 1; day <= daysInMonth; day++) {
         const cell = document.createElement("div");
         cell.className = "day-cell";
@@ -232,11 +273,9 @@
         input.step = "0.5";
         input.className = "day-input";
 
-        // Kayıtlı veriyi getir
         const storageKey = `mesai_${year}_${monthIndex}_${day}`;
         input.value = localStorage.getItem(storageKey) || "";
 
-        // Değer girildiğinde otomatik kaydet ve topla
         input.oninput = () => {
           localStorage.setItem(storageKey, input.value);
           calculateTotal(monthIndex, daysInMonth);
@@ -250,15 +289,23 @@
       calculateTotal(monthIndex, daysInMonth);
     }
 
-    // Toplam Mesai Hesapla
-    function calculateTotal(monthIndex, daysInMonth) {
+    function getMonthTotalHours(monthIndex) {
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       let total = 0;
       for (let day = 1; day <= daysInMonth; day++) {
-        const val = localStorage.getItem(`mesai_2026_${monthIndex}_${day}`);
+        const val = localStorage.getItem(`mesai_${year}_${monthIndex}_${day}`);
         if (val) total += parseFloat(val);
       }
+      return total;
+    }
+
+    function calculateTotal(monthIndex, daysInMonth) {
+      const total = getMonthTotalHours(monthIndex);
       totalHours.innerText = total;
     }
+
+    // Başlangıçta ayları yükle
+    renderMonthsList();
   </script>
 </body>
 </html>
