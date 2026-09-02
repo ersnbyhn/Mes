@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <!-- Mobil cihazlarda otomatik yakınlaşmayı ve sayfa kaymasını tamamen engeller -->
+  <!-- Mobil cihazlarda otomatik yakınlaşmayı ve sayfa kaymasını engeller -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>2026 Mesai Takibi</title>
   <style>
@@ -17,8 +17,8 @@
     html, body {
       height: 100%;
       width: 100%;
-      overflow: hidden; /* Sayfanın taşmasını ve büyümesini engeller */
-      position: fixed; /* Mobilde klavye açıldığında sayfanın kaymasını kilitler */
+      overflow: hidden; /* Sayfanın büyümesini ve taşmasını engeller */
+      position: fixed;
       background-color: #f4f6f8;
     }
 
@@ -31,16 +31,13 @@
 
     .container {
       width: 100%;
-      max-width: 420px;
-      height: 100dvh; /* Dynamic Viewport Height: Mobil ekran yüksekliğini tam kaplar */
-      max-height: 100dvh;
+      max-width: 400px;
       background: #fff;
       border: 2px solid #333;
       border-radius: 8px;
       padding: 12px;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* İçeriği dikeyde tam ortalar */
     }
 
     .hidden {
@@ -55,12 +52,16 @@
       flex-shrink: 0;
     }
 
-    /* 12 Ay Listesi - Tam Dikey ve Yatay Ortalanmış Yapı */
+    /* --- 1. SAYFA: TAM ORTALANMIŞ AYLAR --- */
     #monthsView {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: stretch;
+      min-height: 85vh;
+      justify-content: center; /* İçeriği dikeyde tam ortalar */
+      align-items: center;
+    }
+
+    #monthsView h2 {
+      width: 100%;
+      margin-bottom: 15px;
     }
 
     .months-grid {
@@ -71,11 +72,11 @@
     }
 
     .month-btn {
-      height: 42px;
+      height: 40px;
       padding: 0 15px;
       background: #fff;
       border: 2px solid #333;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: bold;
       display: flex;
       justify-content: space-between;
@@ -89,12 +90,12 @@
     }
 
     .month-hours-badge {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: bold;
       color: #000;
     }
 
-    /* Takvim Header */
+    /* --- 2. SAYFA: STANDART BOYUTLU GÜNLER --- */
     .header-nav {
       display: flex;
       align-items: center;
@@ -114,15 +115,12 @@
       font-size: 13px;
     }
 
-    /* Haftalık Başlıklar ve Takvim Izgarası */
-    .weekdays-grid, .days-grid {
+    .weekdays-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 2px;
       text-align: center;
-    }
-
-    .weekdays-grid {
+      margin-bottom: 2px;
       flex-shrink: 0;
     }
 
@@ -135,34 +133,40 @@
     }
 
     .days-grid {
-      flex: 1;
-      grid-template-rows: repeat(6, 1fr);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
     }
 
+    /* Bütün gün karelerinin eşit ve standart boyutu */
     .day-cell {
+      height: 52px; /* Sabit standart yükseklik */
       border: 1px solid #ccc;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       background: #fff;
+      border-radius: 3px;
       overflow: hidden;
     }
 
     .day-number {
       font-size: 10px;
-      padding: 1px 2px;
-      background: #f9f9f9;
+      padding: 1px 3px;
+      background: #f1f1f1;
       text-align: left;
+      font-weight: bold;
+      color: #333;
     }
 
-    /* iOS & Android klavye odaklanmasında otomatik zoom yapmayı önleyen CSS ayarları */
+    /* Klavye açıldığında zoom engellemek için font-size: 16px */
     .day-input {
       width: 100%;
+      height: 32px;
       border: none;
       text-align: center;
-      font-size: 16px !important; /* Minimum 16px zoom'u engeller */
+      font-size: 16px !important;
       font-weight: bold;
-      padding: 2px 0;
       background: #88d498;
       outline: none;
       -webkit-text-size-adjust: 100%;
@@ -170,7 +174,7 @@
 
     /* Toplam Mesai Alanı */
     .total-bar {
-      margin-top: 8px;
+      margin-top: 10px;
       background: #4caf50;
       color: white;
       padding: 8px;
@@ -278,6 +282,7 @@
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell";
         emptyCell.style.background = "#eee";
+        emptyCell.style.border = "none";
         daysGrid.appendChild(emptyCell);
       }
 
