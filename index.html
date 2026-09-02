@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <!-- Mobil cihazlarda otomatik yakınlaşmayı önler -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>2026 Mesai Takibi</title>
   <style>
@@ -15,10 +14,10 @@
     }
 
     html, body {
-      min-height: 100vh;
       width: 100%;
+      min-height: 100vh;
       background-color: #f4f6f8;
-      overflow-y: auto; /* Dikey kaydırmaya tamamen izin verir */
+      overflow-y: auto !important; /* Dikey kaydırmayı kesin olarak aktif eder */
     }
 
     body {
@@ -37,7 +36,7 @@
       padding: 12px;
       display: flex;
       flex-direction: column;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .hidden {
@@ -49,19 +48,13 @@
       margin-bottom: 12px;
       font-weight: bold;
       font-size: 18px;
-      flex-shrink: 0;
     }
 
-    /* --- 1. SAYFA: TAM ORTALANMIŞ AYLAR --- */
+    /* --- 1. SAYFA: AYLAR --- */
     #monthsView {
       min-height: 80vh;
       justify-content: center;
       align-items: center;
-    }
-
-    #monthsView h2 {
-      width: 100%;
-      margin-bottom: 15px;
     }
 
     .months-grid {
@@ -101,11 +94,10 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8px;
-      flex-shrink: 0;
     }
 
     #backBtn {
-      padding: 5px 10px;
+      padding: 6px 12px;
       background: #333;
       color: #fff;
       border: none;
@@ -120,8 +112,7 @@
       grid-template-columns: repeat(7, 1fr);
       gap: 2px;
       text-align: center;
-      margin-bottom: 2px;
-      flex-shrink: 0;
+      margin-bottom: 4px;
     }
 
     .weekdays-grid div {
@@ -139,7 +130,7 @@
     }
 
     .day-cell {
-      height: 52px;
+      height: 50px;
       border: 1px solid #ccc;
       display: flex;
       flex-direction: column;
@@ -160,34 +151,32 @@
 
     .day-input {
       width: 100%;
-      height: 32px;
+      height: 30px;
       border: none;
       text-align: center;
-      font-size: 16px !important;
+      font-size: 15px !important;
       font-weight: bold;
       background: #88d498;
       outline: none;
-      -webkit-text-size-adjust: 100%;
     }
 
     .total-bar {
-      margin-top: 10px;
+      margin-top: 12px;
       background: #4caf50;
       color: white;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
       font-weight: bold;
       font-size: 15px;
       border-radius: 4px;
-      flex-shrink: 0;
     }
 
-    /* --- MAAŞ HESAPLAMA TABLOSU --- */
+    /* --- MAAŞ HESAPLAMA KARTI --- */
     .salary-calc-card {
       margin-top: 15px;
       padding: 12px;
       background: #f9f9f9;
-      border: 1px solid #ddd;
+      border: 2px solid #333;
       border-radius: 6px;
       display: flex;
       flex-direction: column;
@@ -204,16 +193,15 @@
     }
 
     .calc-row span.label {
-      width: 130px;
+      flex: 1;
     }
 
     .calc-row span.colon {
-      margin-right: 8px;
+      margin: 0 8px;
     }
 
     .calc-row input {
-      flex: 1;
-      max-width: 120px;
+      width: 110px;
       padding: 4px 6px;
       font-size: 15px;
       font-weight: bold;
@@ -224,8 +212,7 @@
     }
 
     .calc-row .readonly-val {
-      flex: 1;
-      max-width: 120px;
+      width: 110px;
       text-align: right;
       padding: 4px 6px;
       font-size: 15px;
@@ -234,8 +221,8 @@
     }
 
     .net-salary-box {
-      margin-top: 6px;
-      padding: 8px;
+      margin-top: 8px;
+      padding: 10px;
       background: #27ae60;
       color: #fff;
       border-radius: 4px;
@@ -277,7 +264,7 @@
       <span id="totalHours">0</span> Saat
     </div>
 
-    <!-- RESİMDEKİ MAAŞ HESAPLAMA TABLOSU -->
+    <!-- MAAŞ HESAPLAMA TABLOSU -->
     <div class="salary-calc-card">
       <div class="calc-row">
         <span class="label">Saat Ücreti</span>
@@ -312,9 +299,9 @@
       <div class="calc-row">
         <span class="label">Vergi Dilimi</span>
         <span class="colon">:</span>
-        <div style="display: flex; align-items: center; gap: 2px;">
-          <span>%</span>
-          <input type="number" id="taxRateVal" value="27" step="1" style="width: 60px;">
+        <div style="display: flex; align-items: center; justify-content: flex-end; width: 110px;">
+          <span style="margin-right:2px;">%</span>
+          <input type="number" id="taxRateVal" value="27" step="1" style="width: 70px;">
         </div>
       </div>
 
@@ -342,7 +329,6 @@
     const totalHours = document.getElementById("totalHours");
     const backBtn = document.getElementById("backBtn");
 
-    // Maaş alanları elemanları
     const hourlyRateInput = document.getElementById("hourlyRate");
     const workHoursVal = document.getElementById("workHoursVal");
     const overtimeHoursVal = document.getElementById("overtimeHoursVal");
@@ -351,7 +337,6 @@
     const taxRateValInput = document.getElementById("taxRateVal");
     const netSalaryResult = document.getElementById("netSalaryResult");
 
-    // Kayıtlı maaş parametrelerini yükle
     function loadSavedSalaryConfig() {
       if (localStorage.getItem("salary_hourlyRate")) {
         hourlyRateInput.value = localStorage.getItem("salary_hourlyRate");
@@ -367,7 +352,6 @@
       }
     }
 
-    // Maaş girdisi değiştiğinde kaydet ve hesapla
     [hourlyRateInput, advanceValInput, unionFeeValInput, taxRateValInput].forEach(input => {
       input.oninput = () => {
         localStorage.setItem("salary_hourlyRate", hourlyRateInput.value);
@@ -407,12 +391,14 @@
       monthsView.classList.add("hidden");
       calendarView.classList.remove("hidden");
       renderCalendar(index);
+      window.scrollTo(0, 0);
     }
 
     backBtn.onclick = () => {
       calendarView.classList.add("hidden");
       monthsView.classList.remove("hidden");
       renderMonthsList();
+      window.scrollTo(0, 0);
     };
 
     function renderCalendar(monthIndex) {
@@ -474,8 +460,6 @@
       totalHours.innerText = total;
       overtimeHoursVal.innerText = total;
 
-      // Ayın gün sayısına göre standart Çalışma Saati Belirleme
-      // 31 Gün: 232.5 | 30 Gün: 225 | 28/29 Gün: (gün sayısı * 7.5)
       let standardWorkHours = daysInMonth === 31 ? 232.5 : (daysInMonth === 30 ? 225 : daysInMonth * 7.5);
       workHoursVal.innerText = standardWorkHours;
 
@@ -490,13 +474,8 @@
       const unionFee = parseFloat(unionFeeValInput.value) || 0;
       const taxRate = parseFloat(taxRateValInput.value) || 0;
 
-      // Brüt Kazanç (Normal Çalışma + Mesai %50 zamlı kabul edilmiştir)
       const grossIncome = (workHours + (overtime * 1.5)) * rate;
-
-      // Vergi Kesintisi
       const taxAmount = grossIncome * (taxRate / 100);
-
-      // Ele Geçen Net Tutar
       const net = grossIncome - taxAmount - advance - unionFee;
 
       netSalaryResult.innerText = `${Math.round(net).toLocaleString('tr-TR')} TL`;
