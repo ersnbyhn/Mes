@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 Mesai Takibi</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    /* 12 Ay Listesi */
+    .months-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .month-btn {
+      padding: 12px;
+      background: #fff;
+      border: 2px solid #333;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .month-btn:active {
+      background-color: #e0e0e0;
+    }
+
+    /* Takvim Header */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    #backBtn {
+      padding: 6px 12px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Haftalık Başlıklar ve Takvim Izgarası */
+    .weekdays-grid, .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .weekdays-grid div {
+      background: #7f8c8d;
+      color: white;
+      padding: 6px 0;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .day-cell {
+      border: 1px solid #ccc;
+      min-height: 55px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #fff;
+    }
+
+    .day-number {
+      font-size: 11px;
+      padding: 2px;
+      background: #f9f9f9;
+    }
+
+    .day-input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 0;
+      background: #88d498; /* Görseldeki yeşil tonu */
+      outline: none;
+    }
+
+    /* Toplam Mesai Alanı */
+    .total-bar {
+      margin-top: 15px;
+      background: #4caf50;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 12 AY SEÇİM EKRANI -->
+  <div id="monthsView" class="container">
+    <h2>2026 MESAİ</h2>
+    <div id="monthsGrid" class="months-grid"></div>
+  </div>
+
+  <!-- AY DETAY / TAKVİM EKRANI -->
+  <div id="calendarView" class="container hidden">
+    <div class="header-nav">
+      <button id="backBtn">← Geri</button>
+      <h2 id="currentMonthTitle">AY</h2>
+      <div style="width: 50px;"></div>
+    </div>
+
+    <!-- Gün Başlıkları (Pzt - Paz) -->
+    <div class="weekdays-grid">
+      <div>Pz</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
+    </div>
+
+    <!-- Takvim Günleri ve Mesai Girdileri -->
+    <div id="daysGrid" class="days-grid"></div>
+
+    <!-- Toplam Mesai Görünümü -->
+    <div class="total-bar">
+      <span>Toplam Mesai: </span>
+      <span id="totalHours">0</span> Saat
+    </div>
+  </div>
+
+  <script>
+    const monthNames = [
+      "OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN",
+      "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"
+    ];
+
+    let selectedMonthIndex = 0;
+
+    const monthsView = document.getElementById("monthsView");
+    const calendarView = document.getElementById("calendarView");
+    const monthsGrid = document.getElementById("monthsGrid");
+    const daysGrid = document.getElementById("daysGrid");
+    const currentMonthTitle = document.getElementById("currentMonthTitle");
+    const totalHours = document.getElementById("totalHours");
+    const backBtn = document.getElementById("backBtn");
+
+    // 12 Ay Butonlarını Oluştur
+    monthNames.forEach((month, index) => {
+      const btn = document.createElement("div");
+      btn.className = "month-btn";
+      btn.innerText = month;
+      btn.onclick = () => openMonth(index);
+      monthsGrid.appendChild(btn);
+    });
+
+    function openMonth(index) {
+      selectedMonthIndex = index;
+      currentMonthTitle.innerText = monthNames[index];
+      monthsView.classList.add("hidden");
+      calendarView.classList.remove("hidden");
+      renderCalendar(index);
+    }
+
+    backBtn.onclick = () => {
+      calendarView.classList.add("hidden");
+      monthsView.classList.remove("hidden");
+    };
+
+    function renderCalendar(monthIndex) {
+      daysGrid.innerHTML = "";
+      const year = 2026;
+      
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      let firstDay = new Date(year, monthIndex, 1).getDay();
+      firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Pazartesiden başlat
+
+      // İlk günden önceki boş kutular
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "day-cell";
+        emptyCell.style.background = "#eee";
+        daysGrid.appendChild(emptyCell);
+      }
+
+      // Günleri ve mesai giriş alanlarını oluştur
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        cell.className = "day-cell";
+
+        const numSpan = document.createElement("span");
+        numSpan.className = "day-number";
+        numSpan.innerText = day;
+
+        const input = document.createElement("input");
+        input.type = "number";
+        input.step = "0.5";
+        input.className = "day-input";
+
+        // Kayıtlı veriyi getir
+        const storageKey = `mesai_${year}_${monthIndex}_${day}`;
+        input.value = localStorage.getItem(storageKey) || "";
+
+        // Değer girildiğinde otomatik kaydet ve topla
+        input.oninput = () => {
+          localStorage.setItem(storageKey, input.value);
+          calculateTotal(monthIndex, daysInMonth);
+        };
+
+        cell.appendChild(numSpan);
+        cell.appendChild(input);
+        daysGrid.appendChild(cell);
+      }
+
+      calculateTotal(monthIndex, daysInMonth);
+    }
+
+    // Toplam Mesai Hesapla
+    function calculateTotal(monthIndex, daysInMonth) {
+      let total = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const val = localStorage.getItem(`mesai_2026_${monthIndex}_${day}`);
+        if (val) total += parseFloat(val);
+      }
+      totalHours.innerText = total;
+    }
+  </script>
+</body>
+</html>
