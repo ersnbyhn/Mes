@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 Mesai Takibi</title>
   <style>
     * {
@@ -10,20 +10,13 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      touch-action: manipulation;
-    }
-
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      background-color: #f4f6f8;
     }
 
     body {
+      background-color: #f4f6f8;
+      padding: 10px;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 10px;
     }
 
     .container {
@@ -33,9 +26,7 @@
       border: 2px solid #333;
       border-radius: 8px;
       padding: 12px;
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
     }
 
     .hidden {
@@ -50,31 +41,25 @@
     }
 
     /* --- 1. SAYFA: AYLAR --- */
-    #monthsView {
-      min-height: 80vh;
-      justify-content: center;
-      align-items: center;
-    }
-
     .months-grid {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       width: 100%;
     }
 
     .month-btn {
-      height: 40px;
+      height: 44px;
       padding: 0 15px;
       background: #fff;
       border: 2px solid #333;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
     }
 
     .month-btn:active {
@@ -82,21 +67,21 @@
     }
 
     .month-hours-badge {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       color: #000;
     }
 
-    /* --- 2. SAYFA: TAKVİM VE MAAŞ HESAPLAMA --- */
+    /* --- 2. SAYFA: TAKVİM VE HESAPLAMA --- */
     .header-nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     #backBtn {
-      padding: 6px 12px;
+      padding: 8px 14px;
       background: #333;
       color: #fff;
       border: none;
@@ -117,8 +102,8 @@
     .weekdays-grid div {
       background: #7f8c8d;
       color: white;
-      padding: 4px 0;
-      font-size: 11px;
+      padding: 6px 0;
+      font-size: 12px;
       font-weight: bold;
     }
 
@@ -160,26 +145,36 @@
     }
 
     .total-bar {
-      margin-top: 10px;
+      margin-top: 15px;
       background: #4caf50;
       color: white;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 16px;
       border-radius: 4px;
     }
 
-    /* --- MAAŞ HESAPLAMA KARTI --- */
+    /* --- MAAŞ HESAPLAMA TABLOSU --- */
+    .section-divider {
+      margin-top: 25px;
+      margin-bottom: 10px;
+      padding-top: 15px;
+      border-top: 2px dashed #999;
+      text-align: center;
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+
     .salary-calc-card {
-      margin-top: 15px;
       padding: 12px;
       background: #f9f9f9;
       border: 2px solid #333;
       border-radius: 6px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .calc-row {
@@ -201,7 +196,7 @@
 
     .calc-row input {
       width: 110px;
-      padding: 4px 6px;
+      padding: 5px 6px;
       font-size: 15px;
       font-weight: bold;
       border: 1px solid #ccc;
@@ -213,7 +208,7 @@
     .calc-row .readonly-val {
       width: 110px;
       text-align: right;
-      padding: 4px 6px;
+      padding: 5px 6px;
       font-size: 15px;
       font-weight: bold;
       color: #2c3e50;
@@ -221,25 +216,27 @@
 
     .net-salary-box {
       margin-top: 8px;
-      padding: 10px;
+      padding: 12px;
       background: #27ae60;
       color: #fff;
       border-radius: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
 
+  <!-- 1. SAYFA: 12 AY SEÇİM EKRANI -->
   <div id="monthsView" class="container">
-    <h2>2026 MESAİ</h2>
+    <h2>2026 MESAİ TAKİBİ</h2>
     <div id="monthsGrid" class="months-grid"></div>
   </div>
 
+  <!-- 2. SAYFA: AY DETAYI, TAKVİM VE MAAŞ TABLOSU -->
   <div id="calendarView" class="container hidden">
     <div class="header-nav">
       <button id="backBtn">← Geri</button>
@@ -247,16 +244,22 @@
       <div style="width: 45px;"></div>
     </div>
 
+    <!-- Gün Başlıkları (Pt - Pz) -->
     <div class="weekdays-grid">
       <div>Pt</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
     </div>
 
+    <!-- Takvim Günleri -->
     <div id="daysGrid" class="days-grid"></div>
 
+    <!-- Toplam Mesai Barı -->
     <div class="total-bar">
       <span>Toplam Mesai: </span>
       <span id="totalHours">0</span> Saat
     </div>
+
+    <!-- MAAŞ HESAPLAMA BAŞLIĞI VE TABLOSU -->
+    <div class="section-divider">MAAŞ HESAPLAMA</div>
 
     <div class="salary-calc-card">
       <div class="calc-row">
@@ -349,13 +352,13 @@
       const inputs = [hourlyRateInput, advanceValInput, unionFeeValInput, taxRateValInput];
       inputs.forEach(input => {
         if (input) {
-          input.oninput = () => {
+          input.addEventListener("input", () => {
             localStorage.setItem("salary_hourlyRate", hourlyRateInput.value);
             localStorage.setItem("salary_advance", advanceValInput.value);
             localStorage.setItem("salary_unionFee", unionFeeValInput.value);
             localStorage.setItem("salary_taxRate", taxRateValInput.value);
             calculateSalary();
-          };
+          });
         }
       });
     }
@@ -389,12 +392,14 @@
       monthsView.classList.add("hidden");
       calendarView.classList.remove("hidden");
       renderCalendar(index);
+      window.scrollTo(0, 0);
     }
 
     backBtn.onclick = () => {
       calendarView.classList.add("hidden");
       monthsView.classList.remove("hidden");
       renderMonthsList();
+      window.scrollTo(0, 0);
     };
 
     function renderCalendar(monthIndex) {
